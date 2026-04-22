@@ -90,8 +90,7 @@
             overflow: hidden;
         }
 
-        /* Shine effect for glass */
-        .location-info::before, .prayer-times-info::before, .card::before {
+        .location-info::before, .prayer-times-info::before, .card::before, .modal-box::before {
             content: '';
             position: absolute;
             top: 0; left: -100%; width: 50%; height: 100%;
@@ -198,7 +197,6 @@
             position: relative;
             transform: translateY(0);
             transition: all 0.15s ease-out;
-            /* 3D Extrusion Effect */
             box-shadow: 
                 0 6px 0 var(--button-shadow), 
                 0 15px 20px rgba(0, 0, 0, 0.4),
@@ -284,9 +282,91 @@
         }
 
         .sound-controls button svg { fill: #fff; width: 16px; height: 16px; }
+
+        /* CUSTOM LOCATION MODAL 3D */
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(10, 15, 30, 0.85);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            display: flex; align-items: center; justify-content: center;
+            z-index: 10000;
+            opacity: 0; visibility: hidden;
+            transition: all 0.4s ease;
+        }
+        .modal-overlay.show { opacity: 1; visibility: visible; }
+        
+        .modal-box {
+            background: var(--card-bg);
+            border-top: 1px solid var(--card-border-light);
+            border-left: 1px solid var(--card-border-light);
+            border-bottom: 1px solid var(--card-border-dark);
+            border-right: 1px solid var(--card-border-dark);
+            border-radius: 1.5rem;
+            padding: 2rem 1.5rem;
+            width: 90%; max-width: 340px;
+            text-align: center;
+            box-shadow: var(--shadow-drop), var(--shadow-inner);
+            transform: translateY(30px) scale(0.9);
+            transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+            position: relative;
+            overflow: hidden;
+        }
+        .modal-overlay.show .modal-box { transform: translateY(0) scale(1); }
+
+        .modal-icon {
+            width: 60px; height: 60px;
+            fill: var(--primary-color);
+            margin-bottom: 1rem;
+            filter: drop-shadow(0 5px 15px var(--glow-color));
+            animation: bounceIcon 2s infinite;
+        }
+
+        @keyframes bounceIcon {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .modal-title { font-size: 1.3rem; font-weight: 700; margin-bottom: 0.5rem; }
+        .modal-desc { font-size: 0.85rem; color: var(--text-subtitle); margin-bottom: 1.5rem; line-height: 1.5; }
+        
+        .modal-buttons { display: flex; flex-direction: column; gap: 0.8rem; }
+        
+        .modal-btn-primary {
+            background: var(--button-base); color: white;
+            border: 1px solid rgba(255,255,255,0.2);
+            padding: 0.8rem; border-radius: 0.8rem;
+            font-weight: 600; font-size: 0.95rem; cursor: pointer;
+            box-shadow: 0 4px 0 var(--button-shadow), 0 10px 15px rgba(0,0,0,0.4);
+            transition: all 0.15s;
+        }
+        .modal-btn-primary:active { transform: translateY(4px); box-shadow: 0 0px 0 var(--button-shadow); }
+        
+        .modal-btn-secondary {
+            background: transparent; color: var(--text-muted);
+            border: 1px solid rgba(255,255,255,0.1);
+            padding: 0.8rem; border-radius: 0.8rem;
+            font-weight: 500; font-size: 0.9rem; cursor: pointer;
+            transition: all 0.2s;
+        }
+        .modal-btn-secondary:hover { background: rgba(255,255,255,0.05); color: white; }
     </style>
 </head>
 <body>
+    <div class="modal-overlay" id="locationModal">
+        <div class="modal-box">
+            <svg class="modal-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16">
+                <path d="M8 16s6-5.686 6-10A6 6 0 0 0 2 6c0 4.314 6 10 6 10zm0-7a3 3 0 1 1 0-6 3 3 0 0 1 0 6z"/>
+            </svg>
+            <h3 class="modal-title">Izin Akses Lokasi</h3>
+            <p class="modal-desc">Kami membutuhkan lokasi Anda untuk menampilkan jadwal sholat yang akurat di daerah Anda secara Real-Time.</p>
+            <div class="modal-buttons">
+                <button class="modal-btn-primary" id="btnAllowLoc">Izinkan Akses Lokasi</button>
+                <button class="modal-btn-secondary" id="btnDenyLoc">Nanti Saja</button>
+            </div>
+        </div>
+    </div>
+
     <div class="loader-container" id="loader">
         <div class="loader"></div>
     </div>
@@ -388,6 +468,11 @@
         const stopBtn = document.getElementById("stopBtn");
         const playIcon = document.getElementById("playIcon");
         const pauseIcon = document.getElementById("pauseIcon");
+        
+        // Element Modal
+        const locationModal = document.getElementById("locationModal");
+        const btnAllowLoc = document.getElementById("btnAllowLoc");
+        const btnDenyLoc = document.getElementById("btnDenyLoc");
 
         let prayerTimes = [];
         let countdownInterval;
@@ -472,17 +557,7 @@
             countdownInterval = setInterval(update, 1000);
         };
 
-        const detectUserLocation = () => {
-            const locationElement = document.getElementById('userLocation');
-            const medanLat = 3.5952;
-            const medanLon = 98.6722;
-
-            if (!navigator.geolocation) {
-                locationElement.textContent = "Geolocation tidak didukung";
-                fetchPrayerTimes(medanLat, medanLon);
-                return;
-            }
-
+        const executeNativeGeolocation = (medanLat, medanLon, locationElement) => {
             navigator.geolocation.getCurrentPosition(
                 (position) => {
                     const { latitude, longitude } = position.coords;
@@ -501,15 +576,66 @@
                 },
                 (error) => {
                     let message = "Izin lokasi diperlukan";
-                    if (error.code === error.PERMISSION_DENIED) message = "Izin lokasi om ditolak";
+                    if (error.code === error.PERMISSION_DENIED) message = "Akses lokasi ditolak";
                     if (error.code === error.POSITION_UNAVAILABLE) message = "Lokasi tidak tersedia.";
                     if (error.code === error.TIMEOUT) message = "Permintaan lokasi timeout";
                     
-                    locationElement.textContent = message + "";
-                    
+                    locationElement.textContent = message;
                     fetchPrayerTimes(medanLat, medanLon);
                 }
             );
+        };
+
+        const detectUserLocation = () => {
+            const locationElement = document.getElementById('userLocation');
+            const medanLat = 3.5952;
+            const medanLon = 98.6722;
+
+            if (!navigator.geolocation) {
+                locationElement.textContent = "Geolocation tidak didukung";
+                fetchPrayerTimes(medanLat, medanLon);
+                return;
+            }
+
+            // Mengecek status izin lokasi di browser
+            if (navigator.permissions) {
+                navigator.permissions.query({ name: 'geolocation' }).then(function(result) {
+                    if (result.state === 'granted') {
+                        // Jika sudah diizinkan sebelumnya, langsung eksekusi tanpa pop-up custom
+                        executeNativeGeolocation(medanLat, medanLon, locationElement);
+                    } else if (result.state === 'prompt') {
+                        // Jika belum ada pilihan, tampilkan Custom Pop-up 3D
+                        locationModal.classList.add('show');
+                        
+                        btnAllowLoc.onclick = () => {
+                            locationModal.classList.remove('show');
+                            executeNativeGeolocation(medanLat, medanLon, locationElement);
+                        };
+                        
+                        btnDenyLoc.onclick = () => {
+                            locationModal.classList.remove('show');
+                            locationElement.textContent = "Akses lokasi dilewati";
+                            fetchPrayerTimes(medanLat, medanLon);
+                        };
+                    } else {
+                        // Jika sudah pernah ditolak permanen oleh user
+                        locationElement.textContent = "Izin lokasi diblokir";
+                        fetchPrayerTimes(medanLat, medanLon);
+                    }
+                });
+            } else {
+                // Fallback untuk browser lama yang tidak mendukung navigator.permissions
+                locationModal.classList.add('show');
+                btnAllowLoc.onclick = () => {
+                    locationModal.classList.remove('show');
+                    executeNativeGeolocation(medanLat, medanLon, locationElement);
+                };
+                btnDenyLoc.onclick = () => {
+                    locationModal.classList.remove('show');
+                    locationElement.textContent = "Akses lokasi dilewati";
+                    fetchPrayerTimes(medanLat, medanLon);
+                };
+            }
         };
 
         const updateTime = () => {
@@ -559,4 +685,4 @@
     });
     </script>
 </body>
-  </html>
+</html>
