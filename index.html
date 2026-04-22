@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>Ridho Sandhika</title>
+    <link rel="shortcut icon" href="new-image.jpg" type="image/x-icon">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            /* Palette 3D Modern */
+            --bg-grad-1: #0f172a;
+            --bg-grad-2: #1e1b4b;
+            --primary-gradient: linear-gradient(135deg, #00acc1, #005c67);
+            --primary-color: #00acc1;
+            --button-base: #007e8e;
+            --button-shadow: #004b55;
+            
+            --card-bg: rgba(20, 27, 45, 0.65);
+            --card-border-light: rgba(255, 255, 255, 0.15);
+            --card-border-dark: rgba(0, 0, 0, 0.5);
+            
+            --text-title: #f8fafc;
+            --text-subtitle: #cbd5e1;
+            --text-muted: #94a3b8;
+            
+            --glow-color: rgba(0, 172, 193, 0.5);
+            --shadow-drop: 0 20px 40px -10px rgba(0, 0, 0, 0.7);
+            --shadow-inner: inset 0 1px 1px rgba(255, 255, 255, 0.2), inset 0 -1px 1px rgba(0, 0, 0, 0.3);
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        
+        body, html {
+            font-family: 'Poppins', 'Segoe UI', sans-serif;
+            color: var(--text-title);
+            min-height: 100vh;
+            background: linear-gradient(-45deg, #0f172a, #0f2b3c, #1e1b4b, #0a0a0a);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
+            overflow-x: hidden;
+        }
+
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .content-wrapper {
+            width: 100%;
+            max-width: 500px;
+            margin: 0 auto;
+            padding: 3rem 1rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5rem;
+        }
+
+        /* 3D Glass Info Containers */
+        .top-info-container {
+            width: 100%;
+            opacity: 0;
+            transition: opacity 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            align-items: flex-start;
+        }
+
+        .location-info, .prayer-times-info {
+            background: var(--card-bg);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border-radius: 1.25rem;
+            padding: 1rem 1.25rem;
+            width: 100%;
+            border-top: 1px solid var(--card-border-light);
+            border-left: 1px solid var(--card-border-light);
+            border-bottom: 1px solid var(--card-border-dark);
+            border-right: 1px solid var(--card-border-dark);
+            box-shadow: var(--shadow-drop), var(--shadow-inner);
+            display: flex;
+            flex-direction: column;
+            gap: 0.8rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Shine effect for glass */
+        .location-info::before, .prayer-times-info::before, .card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: -100%; width: 50%; height: 100%;
+            background: linear-gradient(to right, rgba(255,255,255,0) 0%, rgba(255,255,255,0.05) 50%, rgba(255,255,255,0) 100%);
+            transform: skewX(-25deg);
+            animation: shine 6s infinite;
+        }
+
+        @keyframes shine {
+            0% { left: -100%; }
+            20% { left: 200%; }
+            100% { left: 200%; }
+        }
+
+        /* Loading Spinner */
+        .loader-container {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: #0f172a;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            transition: opacity 0.5s ease-out;
+        }
+
+        .loader {
+            border: 4px solid rgba(255,255,255,0.1);
+            border-left-color: var(--primary-color);
+            border-radius: 50%;
+            width: 50px; height: 50px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        /* Main Profile Card 3D */
+        .card {
+            background: var(--card-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: 2rem;
+            padding: 2rem 1.5rem;
+            width: 100%;
+            max-width: 420px;
+            border-top: 1px solid var(--card-border-light);
+            border-left: 1px solid var(--card-border-light);
+            border-bottom: 1px solid var(--card-border-dark);
+            border-right: 1px solid var(--card-border-dark);
+            box-shadow: var(--shadow-drop), var(--shadow-inner);
+            text-align: center;
+            opacity: 0;
+            transform: translateY(40px) scale(0.95);
+            transition: opacity 0.8s ease, transform 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+            z-index: 10;
+            position: relative;
+        }
+
+        .card.show { opacity: 1; transform: translateY(0) scale(1); }
+
+        .profile-img {
+            width: 110px; height: 110px;
+            object-fit: cover;
+            border-radius: 50%;
+            margin-top: -75px;
+            background: #111;
+            padding: 4px;
+            border: 2px solid transparent;
+            background-image: linear-gradient(#111, #111), var(--primary-gradient);
+            background-origin: border-box;
+            background-clip: content-box, border-box;
+            box-shadow: 0 15px 25px rgba(0,0,0,0.5), inset 0 4px 5px rgba(255,255,255,0.2), 0 0 25px var(--glow-color);
+        }
+
+        h1 {
+            font-size: 1.8rem;
+            margin: 1.5rem 0 0.2rem;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+        }
+
+        .subtitle {
+            font-size: 0.95rem;
+            color: var(--text-subtitle);
+            margin-bottom: 2.5rem;
+            font-weight: 400;
+        }
+
+        /* 3D Tactile Buttons */
+        .links { display: flex; flex-direction: column; gap: 1.25rem; }
+
+        .link-btn {
+            display: flex;
+            align-items: center;
+            padding: 1rem 1.2rem;
+            background: var(--button-base);
+            color: #fff;
+            text-decoration: none;
+            border-radius: 1rem;
+            font-weight: 600;
+            font-size: 1rem;
+            position: relative;
+            transform: translateY(0);
+            transition: all 0.15s ease-out;
+            /* 3D Extrusion Effect */
+            box-shadow: 
+                0 6px 0 var(--button-shadow), 
+                0 15px 20px rgba(0, 0, 0, 0.4),
+                inset 0 1px 1px rgba(255, 255, 255, 0.3);
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .link-btn:hover {
+            filter: brightness(1.1);
+            transform: translateY(2px);
+            box-shadow: 
+                0 4px 0 var(--button-shadow), 
+                0 10px 15px rgba(0, 0, 0, 0.4),
+                inset 0 1px 1px rgba(255, 255, 255, 0.3);
+        }
+
+        .link-btn:active {
+            transform: translateY(6px);
+            box-shadow: 
+                0 0px 0 var(--button-shadow), 
+                0 5px 8px rgba(0, 0, 0, 0.5),
+                inset 0 2px 4px rgba(0, 0, 0, 0.4);
+        }
+
+        .link-icon {
+            margin-right: 15px;
+            width: 22px; height: 22px;
+            fill: white;
+            filter: drop-shadow(0 2px 2px rgba(0,0,0,0.3));
+        }
+
+        .footer {
+            margin-top: 3rem;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            font-weight: 300;
+        }
+
+        .top-info-container.show { opacity: 1; }
+
+        .lokasi-item, .waktu-sholat-item { display: flex; align-items: center; gap: 0.8rem; }
+        
+        .lokasi-icon, .waktu-sholat-icon { 
+            width: 18px; height: 18px; 
+            fill: var(--primary-color); 
+            flex-shrink: 0;
+            filter: drop-shadow(0 0 5px var(--glow-color));
+        }
+        
+        .lokasi-label, .waktu-sholat-label { font-weight: 600; color: var(--text-title); margin-right: 0.35rem; }
+        .lokasi-value, .waktu-sholat-value { font-size: 0.85rem; color: var(--text-subtitle); white-space: nowrap; }
+        
+        .time-display { font-size: 0.75rem; color: var(--text-muted); margin-top: 4px; white-space: nowrap; font-family: monospace; }
+        
+        #waktuSholatBerikutnya { 
+            font-size: 0.95rem; color: var(--primary-color); font-weight: 700; white-space: nowrap; text-shadow: 0 0 10px var(--glow-color);
+        }
+
+        /* 3D Sound Controls */
+        .sound-controls { 
+            position: absolute; top: 1.25rem; right: 1.25rem; 
+            display: flex; gap: 0.5rem; 
+        }
+        
+        .sound-controls button { 
+            background: rgba(0,0,0,0.3); 
+            border: 1px solid rgba(255,255,255,0.1); 
+            border-radius: 50%;
+            width: 38px; height: 38px; 
+            cursor: pointer; display: flex; align-items: center; justify-content: center; 
+            box-shadow: inset 0 1px 1px rgba(255,255,255,0.1), 0 4px 6px rgba(0,0,0,0.3);
+            transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1); 
+        }
+        
+        .sound-controls button:hover { 
+            transform: scale(1.1) translateY(-2px); 
+            background: var(--button-base);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4), 0 0 15px var(--glow-color);
+        }
+        
+        .sound-controls button:active {
+            transform: scale(0.95) translateY(2px);
+        }
+
+        .sound-controls button svg { fill: #fff; width: 16px; height: 16px; }
+    </style>
+</head>
+<body>
+    <div class="loader-container" id="loader">
+        <div class="loader"></div>
+    </div>
+    
+    <div class="content-wrapper">
+        <div class="top-info-container" id="topInfoContainer">
+            <div class="location-info">
+                <div class="lokasi-item">
+                    <svg class="lokasi-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16"><path d="M8 16s6-5.686 6-10A6 6 0 0 0 2 6c0 4.314 6 10 6 10zm0-7a3 3 0 1 1 0-6 3 3 0 0 1 0 6z"/></svg>
+                    <div>
+                        <div>
+                            <span class="lokasi-label">Pemilik:</span>
+                            <span class="lokasi-value">Kota Medan, Sumatera Utara</span>
+                        </div>
+                        <div id="adminTimeDisplay" class="time-display"></div>
+                    </div>
+                </div>
+                <div class="lokasi-item">
+                    <svg class="lokasi-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16"><path d="M8 16s6-5.686 6-10A6 6 0 0 0 2 6c0 4.314 6 10 6 10zm0-7a3 3 0 1 1 0-6 3 3 0 0 1 0 6z"/></svg>
+                    <div>
+                        <div>
+                            <span class="lokasi-label">Anda:</span>
+                            <span id="userLocation" class="lokasi-value">Mendeteksi...</span>
+                        </div>
+                        <div id="userTimeDisplay" class="time-display"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="prayer-times-info">
+                <div class="waktu-sholat-item">
+                    <svg class="waktu-sholat-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16"><path d="M3.5 0a.5.5 0 0 1 .5.5V1h8V.5a.5.5 0 0 1 1 0V1h1a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2h1V.5a.5.5 0 0 1 .5-.5zM1 4v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V4H1z"/><path d="M8 11.933a1 1 0 1 1 0-2 1 1 0 0 1 0 2z"/></svg>
+                    <div>
+                        <div>
+                            <span class="waktu-sholat-label">Sholat Berikutnya:</span>
+                            <span id="namaSholatBerikutnya" class="waktu-sholat-value">Memuat...</span>
+                        </div>
+                        <div id="waktuSholatBerikutnya" class="time-display">--:--</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <main class="card" id="mainCard">
+            <div class="sound-controls" id="soundControls">
+                <button id="playPauseBtn" title="Play/Pause Intro">
+                    <svg id="playIcon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16"><path d="M11.596 8.697l-6.363 3.692c-.54.313-1.233-.066-1.233-.697V4.308c0-.63.692-1.01 1.233-.696l6.363 3.692a.802.802 0 0 1 0 1.393z"/></svg>
+                    <svg id="pauseIcon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" style="display:none;"><path d="M5.5 3.5A1.5 1.5 0 0 1 7 5v6a1.5 1.5 0 0 1-3 0V5A1.5 1.5 0 0 1 5.5 3.5zm4 0A1.5 1.5 0 0 1 11 5v6a1.5 1.5 0 0 1-3 0V5a1.5 1.5 0 0 1 1.5-1.5z"/></svg>
+                </button>
+                <button id="stopBtn" title="Stop Intro">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16"><path d="M5 3.5h6A1.5 1.5 0 0 1 12.5 5v6a1.5 1.5 0 0 1-1.5 1.5H5A1.5 1.5 0 0 1 3.5 11V5A1.5 1.5 0 0 1 5 3.5z"/></svg>
+                </button>
+            </div>
+
+            <img src="logo.jpeg" alt="Ridho Sandhika" class="profile-img">
+            <h1>Ridho Sandhika</h1>
+            <p class="subtitle">Web Developer | Still a beginner | Tech Enthusiast</p>
+            
+            <div class="links">
+                <a class="link-btn" href="https://github.com/ridho-sandhika?" target="_blank">
+                    <svg class="link-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16"><path d="M4.5 1A1.5 1.5 0 0 0 3 2.5V3H2a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2h-1v-.5A1.5 1.5 0 0 0 11.5 1h-7zM13 5H3v8h10V5z"/></svg>
+                    <span>ridho-sandhika-overview</span>
+                </a>
+                <a class="link-btn" href="https://appwebiatech.github.io/AppWebiatech-Store/" target="_blank">
+                    <svg class="link-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16"><path d="M2.5 1A1.5 1.5 0 0 0 1 2.5v11A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-11A1.5 1.5 0 0 0 13.5 1h-11zM2 3h12v10H2V3zm2 2v1h8V5H4zm0 3v1h8V8H4zm0 3v1h4v-1H4z"/></svg>
+                    <span>AppWebiatect Store</span>
+                </a>
+                <a class="link-btn" href="https://ridho-sandhika.github.io/ridho-sandhika/" target="_blank">
+                    <svg class="link-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16"><path d="M2.5 1A1.5 1.5 0 0 0 1 2.5v11A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-11A1.5 1.5 0 0 0 13.5 1h-11zM2 3h12v10H2V3zm2 2v1h8V5H4zm0 3v1h8V8H4zm0 3v1h4v-1H4z"/></svg>
+                    <span>Portfolio Ridho Sandhika</span>
+                </a>
+                <a class="link-btn" href="https://lootsaku.github.io/lootsaku/" target="_blank">
+                    <svg class="link-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M10.03 2.5a.5.5 0 0 0-.525.432l-1.5 7.5a.5.5 0 1 0 .99.196l1.5-7.5a.5.5 0 0 0-.465-.628zM3.46 3.652a.5.5 0 0 0-.524.433L1.5 11.5a.5.5 0 0 0 .99.196l1.436-7.424a.5.5 0 0 0-.465-.627zm4.238-.012a.5.5 0 0 0-.525.432l-1.5 7.5a.5.5 0 1 0 .99.196l1.5-7.5a.5.5 0 0 0-.465-.628zm4.238-.012a.5.5 0 0 0-.525.432l-1.5 7.5a.5.5 0 1 0 .99.196l1.5-7.5a.5.5 0 0 0-.465-.628zM3 13a1 1 0 1 1 2 0 1 1 0 0 1-2 0zm3 0a1 1 0 1 1 2 0 1 1 0 0 1-2 0zm3 0a1 1 0 1 1 2 0 1 1 0 0 1-2 0zm3 0a1 1 0 1 1 2 0 1 1 0 0 1-2 0z"/></svg>
+                    <span>Top UP EP EP DI WEBSITE SAYA INI IYO</span>
+                </a>
+                <a class="link-btn" href="http://www.horekitanikah.com" target="_blank">
+                    <svg class="link-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16"><path d="M11.23 2.12a5.002 5.002 0 0 1 4.51 2.37C17.062 6.41 16.234 8.28 14.286 10c-1.928 1.69-3.486 2.5-4.837 2.5H8.5A1.5 1.5 0 0 1 7 11V7.5a1.5 1.5 0 0 1 1.5-1.5h.172c.49 0 .973.164 1.371.47l.192.144c.48.36.966.362 1.442.003l.117-.087c.433-.314.93-.497 1.448-.497h.03c.126 0 .252.01.378.029.5.076.99.27 1.423.565l.07.048c.45.305.975.33 1.428.01zM1.94 4.14a1.5 1.5 0 0 1 .531-2.022l1.376-.92a1.5 1.5 0 0 1 2.022.531l.92 1.376a1.5 1.5 0 0 1-.53 2.022L5 6.068a1.5 1.5 0 0 1-2.022-.53L1.94 4.14z"/></svg>
+                    <span>KUNJUNGI WEBSITE SAYA (HoreKitaNikah)</span>
+                </a>
+                <a class="link-btn" href="https://youtube.com/@onedayfactt?si=KIbIyZCDRdj8u0Uu" target="_blank">
+                    <svg class="link-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16"><path d="M1.5 2A1.5 1.5 0 0 0 0 3.5v9A1.5 1.5 0 0 0 1.5 14h13a1.5 1.5 0 0 0 1.5-1.5v-9A1.5 1.5 0 0 0 14.5 2h-13zM8 8a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-1 0v-2A.5.5 0 0 1 8 8zm0-3.5a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-1 0v-2a.5.5 0 0 1 .5-.5z"/></svg>
+                    <span>SUBSCRIBE</span>
+                </a>
+            </div>
+            
+            <div class="footer">
+                &copy; Ridho Sandhika 2025 -  Allrights reserved.
+            </div>
+        </main>
+    </div>
+
+    <audio id="introSound" src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" preload="auto" loop></audio>
+    <script>
+    document.addEventListener("DOMContentLoaded", () => {
+        const loader = document.getElementById("loader");
+        const mainCard = document.getElementById("mainCard");
+        const topInfoContainer = document.getElementById("topInfoContainer");
+        const introSound = document.getElementById("introSound");
+        const playPauseBtn = document.getElementById("playPauseBtn");
+        const stopBtn = document.getElementById("stopBtn");
+        const playIcon = document.getElementById("playIcon");
+        const pauseIcon = document.getElementById("pauseIcon");
+
+        let prayerTimes = [];
+        let countdownInterval;
+        
+        const addMinutes = (time, minsToAdd) => {
+            const [hour, minute] = time.split(':').map(Number);
+            const date = new Date();
+            date.setHours(hour);
+            date.setMinutes(minute + minsToAdd);
+            
+            const newHour = String(date.getHours()).padStart(2, '0');
+            const newMinute = String(date.getMinutes()).padStart(2, '0');
+
+            return `${newHour}:${newMinute}`;
+        };
+
+        const fetchPrayerTimes = (lat, lon) => {
+            const timestamp = Math.floor(Date.now() / 1000);
+            const apiUrl = `https://api.aladhan.com/v1/timings/${timestamp}?latitude=${lat}&longitude=${lon}&method=11`;
+
+            fetch(apiUrl)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.code === 200) {
+                        const timings = data.data.timings;
+                        const adjustmentMinutes = 2;
+
+                        prayerTimes = [
+                            { name: 'Subuh',   time: addMinutes(timings.Fajr, adjustmentMinutes) },
+                            { name: 'Dzuhur',  time: addMinutes(timings.Dhuhr, adjustmentMinutes) },
+                            { name: 'Ashar',   time: addMinutes(timings.Asr, adjustmentMinutes) },
+                            { name: 'Maghrib', time: addMinutes(timings.Maghrib, adjustmentMinutes) },
+                            { name: 'Isya',    time: addMinutes(timings.Isha, adjustmentMinutes) }
+                        ];
+                        scheduleNextPrayerCountdown();
+                    } else {
+                        throw new Error('Gagal memuat data waktu sholat dari API.');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching prayer times:', error);
+                    document.getElementById('namaSholatBerikutnya').textContent = 'Gagal';
+                    document.getElementById('waktuSholatBerikutnya').textContent = 'Periksa koneksi';
+                });
+        };
+        
+        const scheduleNextPrayerCountdown = () => {
+            if (countdownInterval) clearInterval(countdownInterval);
+
+            const update = () => {
+                const now = new Date();
+                let nextPrayer = null;
+                let nextPrayerTime = null;
+
+                for (const prayer of prayerTimes) {
+                    const [hour, minute] = prayer.time.split(':');
+                    const prayerTimeToday = new Date(now.getFullYear(), now.getMonth(), now.getDate(), hour, minute);
+
+                    if (prayerTimeToday > now) {
+                        nextPrayer = prayer;
+                        nextPrayerTime = prayerTimeToday;
+                        break;
+                    }
+                }
+
+                if (!nextPrayer) {
+                    nextPrayer = prayerTimes[0]; 
+                    const [hour, minute] = nextPrayer.time.split(':');
+                    nextPrayerTime = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1, hour, minute);
+                }
+                
+                const diff = nextPrayerTime.getTime() - now.getTime();
+                const hours = Math.floor(diff / (1000 * 60 * 60));
+                const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+                const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+
+                document.getElementById('namaSholatBerikutnya').textContent = nextPrayer.name;
+                document.getElementById('waktuSholatBerikutnya').textContent = `${nextPrayer.time} (dalam ${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')})`;
+            };
+            
+            update();
+            countdownInterval = setInterval(update, 1000);
+        };
+
+        const detectUserLocation = () => {
+            const locationElement = document.getElementById('userLocation');
+            const medanLat = 3.5952;
+            const medanLon = 98.6722;
+
+            if (!navigator.geolocation) {
+                locationElement.textContent = "Geolocation tidak didukung";
+                fetchPrayerTimes(medanLat, medanLon);
+                return;
+            }
+
+            navigator.geolocation.getCurrentPosition(
+                (position) => {
+                    const { latitude, longitude } = position.coords;
+                    fetchPrayerTimes(latitude, longitude);
+                    
+                    fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`)
+                        .then(response => response.json())
+                        .then(data => {
+                            const city = data.address.city || data.address.town || data.address.village || 'Lokasi';
+                            const country = data.address.country || '';
+                            locationElement.textContent = `${city}, ${country}`.replace(/, $/, '');
+                        })
+                        .catch(() => {
+                            locationElement.textContent = 'Gagal mengambil nama lokasi';
+                        });
+                },
+                (error) => {
+                    let message = "Izin lokasi diperlukan";
+                    if (error.code === error.PERMISSION_DENIED) message = "Izin lokasi om ditolak";
+                    if (error.code === error.POSITION_UNAVAILABLE) message = "Lokasi tidak tersedia.";
+                    if (error.code === error.TIMEOUT) message = "Permintaan lokasi timeout";
+                    
+                    locationElement.textContent = message + "";
+                    
+                    fetchPrayerTimes(medanLat, medanLon);
+                }
+            );
+        };
+
+        const updateTime = () => {
+            const now = new Date();
+            const timeOptions = { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' };
+            
+            document.getElementById("adminTimeDisplay").textContent = now.toLocaleString('id-ID', { ...timeOptions, timeZone: 'Asia/Jakarta' });
+            document.getElementById("userTimeDisplay").textContent = now.toLocaleString('id-ID', timeOptions);
+        };
+
+        playPauseBtn.addEventListener("click", () => {
+            if (introSound.paused) { introSound.play(); } else { introSound.pause(); }
+        });
+
+        stopBtn.addEventListener("click", () => {
+            introSound.pause();
+            introSound.currentTime = 0;
+        });
+
+        introSound.addEventListener('play', () => {
+            playIcon.style.display = 'none';
+            pauseIcon.style.display = 'block';
+        });
+
+        introSound.addEventListener('pause', () => {
+            playIcon.style.display = 'block';
+            pauseIcon.style.display = 'none';
+        });
+
+        window.addEventListener("load", () => {
+            setTimeout(() => {
+                loader.style.opacity = "0";
+                loader.addEventListener('transitionend', () => loader.style.display = 'none');
+                
+                mainCard.classList.add("show");
+                topInfoContainer.classList.add("show");
+
+                introSound.play().catch(() => {
+                    console.log("Autoplay musik diblokir oleh browser.");
+                });
+                
+                detectUserLocation();
+                updateTime();
+                setInterval(updateTime, 1000);
+            }, 500);
+        });
+    });
+    </script>
+</body>
+  </html>
