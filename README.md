@@ -2,7 +2,7 @@
 
 Sebuah website portofolio pribadi interaktif yang didesain dengan konsep **Modern 3D** dan **Glassmorphism**. Website ini tidak hanya menampilkan tautan (link tree), tetapi juga menghadirkan fungsionalitas cerdas dan tampilan visual yang memanjakan mata.
 
-🌐 **Live Demo:** [Masukkan Link Website Kamu Di Sini, contoh: https://ridho-sandhika.github.io/portfolio]
+🌐 **Live Demo:** [https://ridho-sandhika.github.io/portfolio]
 
 ## ✨ Fitur Utama
 
