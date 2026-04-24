@@ -16,7 +16,7 @@
             --primary-gradient: linear-gradient(135deg, #00acc1, #005c67);
             --primary-color: #00acc1;
             --button-base: #007e8e;
-            --button-shadow: #004b55;
+            --button-shadow: #00363d;
             
             --card-bg: rgba(20, 27, 45, 0.65);
             --card-border-light: rgba(255, 255, 255, 0.15);
@@ -181,52 +181,144 @@
             font-weight: 400;
         }
 
-        /* 3D Tactile Buttons */
-        .links { display: flex; flex-direction: column; gap: 1.25rem; }
+        /* =========================================
+           3D LIQUID SPINNING RESIN BUTTONS
+           ========================================= */
+        .links { 
+            display: flex; 
+            flex-direction: column; 
+            gap: 1.25rem; 
+            width: 100%;
+        }
 
         .link-btn {
             display: flex;
             align-items: center;
-            padding: 1rem 1.2rem;
-            background: var(--button-base);
+            justify-content: flex-start;
+            padding: 1.1rem 1.5rem;
+            background: rgba(15, 23, 42, 0.4); /* Material kaca gelap */
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-radius: 50px; /* Bentuk Kapsul/Pill */
             color: #fff;
             text-decoration: none;
-            border-radius: 1rem;
-            font-weight: 600;
-            font-size: 1rem;
+            font-weight: 500;
+            font-size: 0.95rem;
             position: relative;
-            transform: translateY(0);
-            transition: all 0.15s ease-out;
+            overflow: hidden; /* Memotong cairan agar tidak keluar tombol */
+            transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+            
+            /* Efek Kaca 3D */
             box-shadow: 
-                0 6px 0 var(--button-shadow), 
-                0 15px 20px rgba(0, 0, 0, 0.4),
-                inset 0 1px 1px rgba(255, 255, 255, 0.3);
-            border: 1px solid rgba(255,255,255,0.1);
+                0 10px 20px rgba(0, 0, 0, 0.4), 
+                inset 0 3px 5px rgba(255, 255, 255, 0.3), 
+                inset 0 -4px 6px rgba(0, 0, 0, 0.7), 
+                inset 0 0 10px rgba(255, 255, 255, 0.05); 
+            
+            border: 1px solid rgba(255, 255, 255, 0.08); 
         }
 
-        .link-btn:hover {
-            filter: brightness(1.1);
-            transform: translateY(2px);
-            box-shadow: 
-                0 4px 0 var(--button-shadow), 
-                0 10px 15px rgba(0, 0, 0, 0.4),
-                inset 0 1px 1px rgba(255, 255, 255, 0.3);
+        /* Gumpalan Cairan (Blob) Kiri */
+        .link-btn::before {
+            content: '';
+            position: absolute;
+            width: 180px;
+            height: 180px;
+            background: radial-gradient(circle, #00e5ff 0%, #00acc1 50%, transparent 80%);
+            border-radius: 40%; /* Bentuk abstrak */
+            top: 50%;
+            left: 20%; 
+            transform: translate(-50%, -50%) rotate(0deg) scale(1);
+            opacity: 0;
+            z-index: 0;
+            transition: opacity 0.5s ease;
+            filter: blur(15px); /* Efek cairan */
         }
 
-        .link-btn:active {
-            transform: translateY(6px);
-            box-shadow: 
-                0 0px 0 var(--button-shadow), 
-                0 5px 8px rgba(0, 0, 0, 0.5),
-                inset 0 2px 4px rgba(0, 0, 0, 0.4);
+        /* Gumpalan Cairan (Blob) Kanan */
+        .link-btn::after {
+            content: '';
+            position: absolute;
+            width: 150px;
+            height: 150px;
+            background: radial-gradient(circle, #008ba3 0%, #005c67 60%, transparent 80%);
+            border-radius: 45%;
+            top: 50%;
+            right: -30%;
+            transform: translate(-50%, -50%) rotate(0deg) scale(1);
+            opacity: 0;
+            z-index: 0;
+            transition: opacity 0.5s ease;
+            filter: blur(20px);
+            mix-blend-mode: screen;
         }
 
+        /* Efek saat Disentuh / Hover */
+        .link-btn:hover, .link-btn:active {
+            transform: translateY(-4px) scale(1.02);
+            border-color: rgba(0, 172, 193, 0.5);
+            background: rgba(15, 23, 42, 0.6);
+            box-shadow: 
+                0 15px 30px rgba(0, 0, 0, 0.5), 
+                0 0 20px rgba(0, 172, 193, 0.3), 
+                inset 0 4px 6px rgba(255, 255, 255, 0.4), 
+                inset 0 -4px 6px rgba(0, 0, 0, 0.8),
+                inset 0 0 25px rgba(0, 172, 193, 0.5); 
+        }
+
+        /* Memulai Putaran Cairan */
+        .link-btn:hover::before, .link-btn:active::before {
+            opacity: 0.8;
+            animation: spinBlob 4s linear infinite; /* Putar searah jarum jam */
+        }
+
+        .link-btn:hover::after, .link-btn:active::after {
+            opacity: 0.9;
+            animation: spinBlob 3s linear infinite reverse; /* Putar berlawanan arah */
+        }
+
+        /* Animasi Cairan Berputar dan Bernapas */
+        @keyframes spinBlob {
+            0% { transform: translate(-50%, -50%) rotate(0deg) scale(1); }
+            50% { transform: translate(-50%, -50%) rotate(180deg) scale(1.3); } /* Membesar di tengah putaran */
+            100% { transform: translate(-50%, -50%) rotate(360deg) scale(1); }
+        }
+
+        /* Ikon Kiri */
         .link-icon {
             margin-right: 15px;
             width: 22px; height: 22px;
             fill: white;
-            filter: drop-shadow(0 2px 2px rgba(0,0,0,0.3));
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5));
+            position: relative;
+            z-index: 2;
         }
+
+        /* Teks Tombol */
+        .link-text {
+            position: relative;
+            z-index: 2;
+            flex-grow: 1; /* Mendorong ikon titik-titik ke kanan */
+            text-align: left;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+            letter-spacing: 0.5px;
+        }
+
+        /* Ikon Titik Tiga Kanan (Persis seperti di video) */
+        .link-dots {
+            width: 24px;
+            height: 24px;
+            fill: rgba(255, 255, 255, 0.4);
+            position: relative;
+            z-index: 2;
+            transition: fill 0.3s ease;
+            filter: drop-shadow(0 2px 2px rgba(0,0,0,0.5));
+        }
+
+        .link-btn:hover .link-dots, .link-btn:active .link-dots {
+            fill: #fff;
+        }
+        /* ========================================= */
 
         .footer {
             margin-top: 3rem;
@@ -427,27 +519,38 @@
             <div class="links">
                 <a class="link-btn" href="https://github.com/ridho-sandhika?" target="_blank">
                     <svg class="link-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16"><path d="M4.5 1A1.5 1.5 0 0 0 3 2.5V3H2a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2h-1v-.5A1.5 1.5 0 0 0 11.5 1h-7zM13 5H3v8h10V5z"/></svg>
-                    <span>ridho-sandhika-overview</span>
+                    <span class="link-text">ridho-sandhika-overview</span>
+                    <svg class="link-dots" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16"><path d="M3 9.5a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3z"/></svg>
                 </a>
+                
                 <a class="link-btn" href="https://appwebiatech.github.io/AppWebiatech-Store/" target="_blank">
                     <svg class="link-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16"><path d="M2.5 1A1.5 1.5 0 0 0 1 2.5v11A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-11A1.5 1.5 0 0 0 13.5 1h-11zM2 3h12v10H2V3zm2 2v1h8V5H4zm0 3v1h8V8H4zm0 3v1h4v-1H4z"/></svg>
-                    <span>AppWebiatect Store</span>
+                    <span class="link-text">AppWebiatect Store</span>
+                    <svg class="link-dots" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16"><path d="M3 9.5a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3z"/></svg>
                 </a>
+                
                 <a class="link-btn" href="https://ridho-sandhika.github.io/ridho-sandhika/" target="_blank">
                     <svg class="link-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16"><path d="M2.5 1A1.5 1.5 0 0 0 1 2.5v11A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-11A1.5 1.5 0 0 0 13.5 1h-11zM2 3h12v10H2V3zm2 2v1h8V5H4zm0 3v1h8V8H4zm0 3v1h4v-1H4z"/></svg>
-                    <span>Portfolio Ridho Sandhika</span>
+                    <span class="link-text">Portfolio Ridho Sandhika</span>
+                    <svg class="link-dots" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16"><path d="M3 9.5a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3z"/></svg>
                 </a>
+                
                 <a class="link-btn" href="https://lootsaku.github.io/lootsaku/" target="_blank">
                     <svg class="link-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M10.03 2.5a.5.5 0 0 0-.525.432l-1.5 7.5a.5.5 0 1 0 .99.196l1.5-7.5a.5.5 0 0 0-.465-.628zM3.46 3.652a.5.5 0 0 0-.524.433L1.5 11.5a.5.5 0 0 0 .99.196l1.436-7.424a.5.5 0 0 0-.465-.627zm4.238-.012a.5.5 0 0 0-.525.432l-1.5 7.5a.5.5 0 1 0 .99.196l1.5-7.5a.5.5 0 0 0-.465-.628zm4.238-.012a.5.5 0 0 0-.525.432l-1.5 7.5a.5.5 0 1 0 .99.196l1.5-7.5a.5.5 0 0 0-.465-.628zM3 13a1 1 0 1 1 2 0 1 1 0 0 1-2 0zm3 0a1 1 0 1 1 2 0 1 1 0 0 1-2 0zm3 0a1 1 0 1 1 2 0 1 1 0 0 1-2 0zm3 0a1 1 0 1 1 2 0 1 1 0 0 1-2 0z"/></svg>
-                    <span>Top UP EP EP DI WEBSITE SAYA INI IYO</span>
+                    <span class="link-text">Top UP EP EP DI WEBSITE SINI</span>
+                    <svg class="link-dots" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16"><path d="M3 9.5a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3z"/></svg>
                 </a>
+                
                 <a class="link-btn" href="http://www.horekitanikah.com" target="_blank">
                     <svg class="link-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16"><path d="M11.23 2.12a5.002 5.002 0 0 1 4.51 2.37C17.062 6.41 16.234 8.28 14.286 10c-1.928 1.69-3.486 2.5-4.837 2.5H8.5A1.5 1.5 0 0 1 7 11V7.5a1.5 1.5 0 0 1 1.5-1.5h.172c.49 0 .973.164 1.371.47l.192.144c.48.36.966.362 1.442.003l.117-.087c.433-.314.93-.497 1.448-.497h.03c.126 0 .252.01.378.029.5.076.99.27 1.423.565l.07.048c.45.305.975.33 1.428.01zM1.94 4.14a1.5 1.5 0 0 1 .531-2.022l1.376-.92a1.5 1.5 0 0 1 2.022.531l.92 1.376a1.5 1.5 0 0 1-.53 2.022L5 6.068a1.5 1.5 0 0 1-2.022-.53L1.94 4.14z"/></svg>
-                    <span>KUNJUNGI WEBSITE SAYA (HoreKitaNikah)</span>
+                    <span class="link-text">KUNJUNGI (HoreKitaNikah)</span>
+                    <svg class="link-dots" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16"><path d="M3 9.5a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3z"/></svg>
                 </a>
+                
                 <a class="link-btn" href="https://youtube.com/@onedayfactt?si=KIbIyZCDRdj8u0Uu" target="_blank">
                     <svg class="link-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16"><path d="M1.5 2A1.5 1.5 0 0 0 0 3.5v9A1.5 1.5 0 0 0 1.5 14h13a1.5 1.5 0 0 0 1.5-1.5v-9A1.5 1.5 0 0 0 14.5 2h-13zM8 8a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-1 0v-2A.5.5 0 0 1 8 8zm0-3.5a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-1 0v-2a.5.5 0 0 1 .5-.5z"/></svg>
-                    <span>SUBSCRIBE</span>
+                    <span class="link-text">SUBSCRIBE</span>
+                    <svg class="link-dots" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16"><path d="M3 9.5a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3z"/></svg>
                 </a>
             </div>
             
